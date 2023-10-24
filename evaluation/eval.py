@@ -28,4 +28,33 @@ def evaluate(test_db, trained_tree): ### This function is still provisional: Cor
     else:
         accuracy = 0
 
-    return accuracy, confusion
+    return accuracy, confusion ### Does this need to be returned as tuple as done in the lab?
+
+# Returns array with precision of each class and the macro-averaged precision
+def precision(confusion): ### Provisional Function
+    p = np.zeros(len(confusion))
+    for i in range(len(confusion)):
+        p[i] = confusion[i, i] / np.sum(confusion[:, i])
+
+    if len(p) > 0:
+        macro_p = np.mean(p)
+    else:
+        macro_p = 0
+    
+    ### Do we really need to calculate macro_p as well?
+    ### Maybe we won't work out averages of all macro_p from all evaluations?
+
+    return p, macro_p ### Does this need to be returned as tuple as in lab?
+
+# Returns array with recalls of each class and the macro-averaged recall
+def recall(confusion): ### Provisional Function
+    r = np.zeros(len(confusion))
+    for i in range(len(confusion)):
+        r[i] = confusion[i, i] / np.sum(confusion[i, :])
+
+    if len(r) > 0:
+        macro_r = np.mean(r)
+    else:
+        macro_r = 0
+    
+    return r, macro_r
