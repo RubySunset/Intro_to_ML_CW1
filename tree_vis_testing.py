@@ -22,6 +22,22 @@ from tree_vis import *
 #         },
 #         'depth' : 0}
 
+# Naive solution using preorder recursion. Looks bad with deep trees.
+# node: root node of the tree.
+def basic_plot(node, x=0, y=50):
+    if type(node) is int: # Plot leaf node
+        plt.text(x, y, str(node), ha='center', va='center',
+                 bbox={'boxstyle' : 'square', 'ec' : (0, 0, 0), 'fc' : (1, 1, 1)})
+    else:
+        plt.text(x, y, str(node['split feature']) + ' < ' + str(node['split value']), ha='center', va='center',
+                 bbox={'boxstyle' : 'square', 'ec' : (0, 0, 0), 'fc' : (1, 1, 1)})
+        y_next = y - 10
+        x_left = x - 2**(1 - node['depth'])
+        x_right = x + 2**(1 - node['depth'])
+        plt.plot((x - 2**(1 - node['depth']), x, x + 2**(1 - node['depth'])), (y_next, y, y_next)) # Plot lines to children
+        basic_plot(node['left'], x_left, y_next)
+        basic_plot(node['right'], x_right, y_next)
+
 # Generate a random tree.
 # node: the root node to start the tree from.
 # p: the probability that a left/right child will be created for a current leaf node.
@@ -45,4 +61,5 @@ plt.axis('off')
 basic_plot(root)
 
 # Comare to Reingold-Tilford algorithm.
-vis_tree(root)
+vis = TreeVis()
+vis.draw(root)
