@@ -45,40 +45,63 @@ def tree_to_string(tree, depth=0):
     return string
 
 
-# Calculates Entropy of a dataset
-# def Entropy(dataset):
 # Change the variables as you like to match the rest of the code if you want
-
 # Compute the Entropy of a subset S, where S is a list of labels
 def entropy(S):
     total_samples = len(S)
     unique_labels = set(S)
     entropy_val = 0
-    
+
     for label in unique_labels:
         p_k = S.count(label) / total_samples
         entropy_val -= p_k * math.log2(p_k)
-    
+
     return entropy_val
+
 
 # Computing the remainder for subsets S_left and S_right
 def remainder(S_left, S_right):
     total_samples = len(S_left) + len(S_right)
-    return(len(S_left) / total_samples) * entropy(S_left) + (len(S_right) / total_samples * entropy(S_right))
+    return (len(S_left) / total_samples) * entropy(S_left) + (len(S_right) / total_samples * entropy(S_right))
+
 
 # Computing the info gain for given subsets. S_all, S_left, S_right are the lists of the labels
 def inormation_gain(S_all, S_left, S_right):
     return entropy(S_all) - remainder(S_left, S_right)
 
+
 # DUMMY FUNCTION
-def find_best_split(training_dataset, label_counts):
-    rng = np.random.default_rng()
-    ints = rng.integers(low=-10, high=11, size=2)
-    return ("Attr:"+str(ints[0]), ints[1])
+def find_best_split(training_dataset, unique_labels, label_counts):
+    best_split = (None, None)
+    best_entropy = 1
+
+    for i in range(training_dataset.shape[1]-1):
+        # Extracts only ith and label columns and sorts them
+        column_dataset = training_dataset[:, [i, -1]]
+        sorted_indices = np.argsort(column_dataset[:, 0])
+        sorted_dataset = column_dataset[sorted_indices]
+
+        # print(sorted_dataset)
+        for j in range(sorted_dataset.shape[0]-1):
+            print(sorted_dataset[j])
+
+            if sorted_dataset[j, 0] != sorted_dataset[j+1, 0]:
+                new_entropy = entropy(sorted_dataset[:j+1])
+                if new_entropy < best_entropy:
+                    split_value = (sorted_dataset[j] + sorted_dataset[j+1]) / 2
+                    best_split = (i, split_value)
+                    best_entropy = new_entropy
+
+    return best_split
+
+    # print(sorted_dataset)
+    # rng = np.random.default_rng()
+    # ints = rng.integers(low=-10, high=11, size=2)
+    # return ("Feature:"+str(ints[0]), ints[1])
 
 
 # DUMMY FUNCTION
-def split_data(training_dataset, split_value):
+def split_data(training_dataset, split_value, split_feature):
     half_size = int(len(training_dataset)/2)
     right_dataset = training_dataset[:half_size, :]
     left_dataset = training_dataset[half_size:, :]
@@ -99,15 +122,15 @@ def read_dataset(filepath):
 
 # Builds the decision tree and returns the root node
 def decision_tree_learn(training_dataset, depth=0):
-    dataset_labels = training_dataset[:, 7]
+    dataset_labels = training_dataset[:, -1]
     unique_labels, label_counts = np.unique(dataset_labels, return_counts=True)
 
     if len(unique_labels) == 1:
         return (unique_labels[0], depth)
 
     # Dummy Functions find_split and split_data - FIX LATER
-    split_feature, split_value = find_best_split(training_dataset, label_counts)
-    right_dataset, left_dataset = split_data(training_dataset, split_value)
+    split_feature, split_value = find_best_split(training_dataset, unique_labels, label_counts)
+    right_dataset, left_dataset = split_data(training_dataset, split_value, split_feature)
 
     node = create_node(split_feature, split_value, node_depth=depth)
     node["right"], right_depth = decision_tree_learn(right_dataset, depth+1)
@@ -128,4 +151,4 @@ def decision_tree_learn(training_dataset, depth=0):
     return (node, max(right_depth, left_depth))
 
 
-print(tree_to_string(decision_tree_learn(read_dataset(CLEAN_DATA_PATH))[0]))
+print(tree_to_string(decision_tree_learn(read_dataset(CLEAN_DATA_PATH))[0], ))
