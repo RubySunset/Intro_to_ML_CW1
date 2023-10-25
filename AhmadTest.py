@@ -103,10 +103,9 @@ def find_best_split(training_dataset, unique_labels, label_counts):
 
 
 # DUMMY FUNCTION
-def split_data(training_dataset, split_value, split_feature):
-    half_size = int(len(training_dataset)/2)
-    right_dataset = training_dataset[:half_size, :]
-    left_dataset = training_dataset[half_size:, :]
+def split_data(dataset, split_value, split_feature):
+    right_dataset = dataset[dataset[:, split_feature] > split_value ]
+    left_dataset = dataset[dataset[:, split_feature] < split_value]
     return (right_dataset, left_dataset)
 
 
@@ -153,4 +152,7 @@ def decision_tree_learn(training_dataset, depth=0):
     return (node, max(right_depth, left_depth))
 
 
-print(tree_to_string(decision_tree_learn(read_dataset(CLEAN_DATA_PATH))[0], ))
+tree, depth = decision_tree_learn(read_dataset(CLEAN_DATA_PATH))
+print(tree_to_string(tree))
+print("Max Depth:", depth)
+# print(tree_to_string(decision_tree_learn(read_dataset(CLEAN_DATA_PATH)[:1001, :])[0], ))
