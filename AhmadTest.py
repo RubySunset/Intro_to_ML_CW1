@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 CLEAN_DATA_PATH = "wifi_db/clean_dataset.txt"
 NOISY_DATA_PATH = "wifi_db/noisy_dataset.txt"
@@ -44,10 +45,30 @@ def tree_to_string(tree, depth=0):
     return string
 
 
-# Calculates Enathalpy of a dataset
-# def enthalpy(dataset):
-#     labels = dataset[
+# Calculates Entropy of a dataset
+# def Entropy(dataset):
+# Change the variables as you like to match the rest of the code if you want
 
+# Compute the Entropy of a subset S, where S is a list of labels
+def entropy(S):
+    total_samples = len(S)
+    unique_labels = set(S)
+    entropy_val = 0
+    
+    for label in unique_labels:
+        p_k = S.count(label) / total_samples
+        entropy_val -= p_k * math.log2(p_k)
+    
+    return entropy_val
+
+# Computing the remainder for subsets S_left and S_right
+def remainder(S_left, S_right):
+    total_samples = len(S_left) + len(S_right)
+    return(len(S_left) / total_samples) * entropy(S_left) + (len(S_right) / total_samples * entropy(S_right))
+
+# Computing the info gain for given subsets. S_all, S_left, S_right are the lists of the labels
+def inormation_gain(S_all, S_left, S_right):
+    return entropy(S_all) - remainder(S_left, S_right)
 
 # DUMMY FUNCTION
 def find_best_split(training_dataset, label_counts):
