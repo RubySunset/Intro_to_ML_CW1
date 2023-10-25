@@ -53,7 +53,7 @@ def entropy(S):
     entropy_val = 0
 
     for label in unique_labels:
-        p_k = S.count(label) / total_samples
+        p_k = np.count_nonzero(S == label) / total_samples
         entropy_val -= p_k * math.log2(p_k)
 
     return entropy_val
@@ -61,8 +61,8 @@ def entropy(S):
 
 # Computing the remainder for subsets S_left and S_right
 def remainder(S_left, S_right):
-    total_samples = len(S_left) + len(S_right)
-    return (len(S_left) / total_samples) * entropy(S_left) + (len(S_right) / total_samples * entropy(S_right))
+    total_samples = (S_left.shape[0]) + (S_right.shape[0])
+    return (S_left.shape[0] / total_samples) * entropy(S_left) + (S_right.shape[0] / total_samples * entropy(S_right))
 
 
 # Computing the info gain for given subsets. S_all, S_left, S_right are the lists of the labels
@@ -70,34 +70,36 @@ def inormation_gain(S_all, S_left, S_right):
     return entropy(S_all) - remainder(S_left, S_right)
 
 
-# DUMMY FUNCTION
+# Maximises information gain and returns (split_feature, split_value)
 def find_best_split(training_dataset, unique_labels, label_counts):
     best_split = (None, None)
-    best_entropy = 1
+    information_gain_max = 0
 
+    # Iterates over columns/ features of dataset
     for i in range(training_dataset.shape[1]-1):
         # Extracts only ith and label columns and sorts them
         column_dataset = training_dataset[:, [i, -1]]
         sorted_indices = np.argsort(column_dataset[:, 0])
         sorted_dataset = column_dataset[sorted_indices]
 
-        # print(sorted_dataset)
+        # Iterates over every value in the dataset
         for j in range(sorted_dataset.shape[0]-1):
-            print(sorted_dataset[j])
 
+            # Checks if current and next value are not equal
             if sorted_dataset[j, 0] != sorted_dataset[j+1, 0]:
-                new_entropy = entropy(sorted_dataset[:j+1])
-                if new_entropy < best_entropy:
-                    split_value = (sorted_dataset[j] + sorted_dataset[j+1]) / 2
+                left_labels = sorted_dataset[:j+1, 1]
+                right_labels = sorted_dataset[j+1:, 1]
+                information_gain_new = inormation_gain(sorted_dataset[:, 1], left_labels, right_labels)
+
+                if information_gain_new > information_gain_max:
+                    information_gain_max = information_gain_new
+                    # Split vallue takes midpoint between the current and next non equal values
+                    split_value = (sorted_dataset[j][0] + sorted_dataset[j+1][0]) / 2
                     best_split = (i, split_value)
-                    best_entropy = new_entropy
+                    # print(f'Info Gain: {information_gain_new}, Split Value: {split_value}, Index: {i, j}')
+                    continue
 
     return best_split
-
-    # print(sorted_dataset)
-    # rng = np.random.default_rng()
-    # ints = rng.integers(low=-10, high=11, size=2)
-    # return ("Feature:"+str(ints[0]), ints[1])
 
 
 # DUMMY FUNCTION
