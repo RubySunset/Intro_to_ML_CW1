@@ -18,8 +18,8 @@ class TreeVis:
     SIBLING_SEP = 100 # Minimum separation between siblings.
     SUBTREE_SEP = 100 # Minimum separation between the closest nodes of two adjacent subtrees.
     LAYER_SEP = 100 # Separation between adjacent layers.
-    MIN_COLOUR = 0.5 # Minimum value for RGB when plotting lines.
-    MAX_COLOUR = 1.0 # Maximum value for RGB when plotting lines.
+    MIN_COLOUR = 0.0 # Minimum value for RGB when plotting lines.
+    MAX_COLOUR = 0.8 # Maximum value for RGB when plotting lines.
 
     def __init__(self):
         pass
@@ -135,12 +135,12 @@ class TreeVis:
     # max_depth: the maximum depth of the tree.
     def recursive_plot(self, node, max_depth, colours):
         if self.is_leaf(node):
-            plt.text(node['x'], self.LAYER_SEP * (max_depth - node['depth']), str(node['val']),
-                    ha='center', va='center',
+            plt.text(node['x'], self.LAYER_SEP * (max_depth - node['depth']), 'leaf:' + str(node['val']),
+                    ha='center', va='center', size='small',
                     bbox={'boxstyle' : 'square', 'ec' : (0, 0, 0), 'fc' : (1, 1, 1)})
         else:
-            plt.text(node['x'], self.LAYER_SEP * (max_depth - node['depth']), str(node['split feature']) + ' < ' + str(node['split value']),
-                    ha='center', va='center',
+            plt.text(node['x'], self.LAYER_SEP * (max_depth - node['depth']), '[X' + str(node['split feature']) + ' < ' + str(node['split value']) + ']',
+                    ha='center', va='center', size='small',
                     bbox={'boxstyle' : 'square', 'ec' : (0, 0, 0), 'fc' : (1, 1, 1)})
             plt.plot((node['left']['x'], node['x'], node['right']['x']),
                     (self.LAYER_SEP * (max_depth - node['left']['depth']), self.LAYER_SEP * (max_depth - node['depth']), self.LAYER_SEP * (max_depth - node['right']['depth'])),
@@ -170,6 +170,7 @@ class TreeVis:
             # val = min(i / max_depth, 1)
             # colours.append((val, val, val))
             # Generate some random colours for each level of edges.
+            # colours.append((0.8, 0.8, 0.8))
             colours.append((random.uniform(self.MIN_COLOUR, self.MAX_COLOUR), random.uniform(self.MIN_COLOUR, self.MAX_COLOUR), random.uniform(self.MIN_COLOUR, self.MAX_COLOUR)))
         self.recursive_plot(new_root, max_depth, colours)
         plt.show()

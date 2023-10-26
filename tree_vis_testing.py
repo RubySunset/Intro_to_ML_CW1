@@ -26,10 +26,10 @@ from tree_vis import *
 # node: root node of the tree.
 def basic_plot(node, x=0, y=50):
     if not type(node) is dict: # Plot leaf node
-        plt.text(x, y, str(round(node)), ha='center', va='center',
+        plt.text(x, y, str(round(node)), ha='center', va='center', size='small',
                  bbox={'boxstyle' : 'square', 'ec' : (0, 0, 0), 'fc' : (1, 1, 1)})
     else:
-        plt.text(x, y, str(node['split feature']) + ' < ' + str(node['split value']), ha='center', va='center',
+        plt.text(x, y, str(node['split feature']) + ' < ' + str(node['split value']), ha='center', va='center', size='small',
                  bbox={'boxstyle' : 'square', 'ec' : (0, 0, 0), 'fc' : (1, 1, 1)})
         y_next = y - 10
         x_left = x - 2**(1 - node['depth'])
