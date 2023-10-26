@@ -1,13 +1,24 @@
 import copy
 import random
+# import matplotlib
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
+# Node structure:
+# split feature: int
+# split value: float
+# left: dict
+# right: dict
+# depth: int
+#
+# Note: leaf nodes are represented as a numpy float (need to round to int)
 
 class TreeVis:
 
     SIBLING_SEP = 100 # Minimum separation between siblings.
     SUBTREE_SEP = 100 # Minimum separation between the closest nodes of two adjacent subtrees.
     LAYER_SEP = 100 # Separation between adjacent layers.
-    MIN_COLOUR = 0.2 # Minimum value for RGB when plotting lines.
+    MIN_COLOUR = 0.5 # Minimum value for RGB when plotting lines.
     MAX_COLOUR = 1.0 # Maximum value for RGB when plotting lines.
 
     def __init__(self):
@@ -26,13 +37,13 @@ class TreeVis:
         node['mod'] = 0
         node['shift'] = 0
         # Consider left subtree.
-        if type(node['left']) is int: # Convert left leaf node to dict
-            node['left'] = {'val' : node['left'], 'left' : 0, 'right' : 0, 'mod' : 0, 'shift' : 0, 'x' : 0, 'depth' : node['depth'] + 1}
+        if not type(node['left']) is dict: # Convert left leaf node to dict
+            node['left'] = {'val' : round(node['left']), 'left' : 0, 'right' : 0, 'mod' : 0, 'shift' : 0, 'x' : 0, 'depth' : node['depth'] + 1}
         else:
             max_depth = max(max_depth, self.pre_pass(node['left'], max_depth))
         # Consider right subtree.
-        if type(node['right']) is int: # Convert right leaf node to dict
-            node['right'] = {'val' : node['right'], 'left' : 0, 'right' : 0, 'mod' : 0, 'shift' : 0, 'x' : 0, 'depth' : node['depth'] + 1}
+        if not type(node['right']) is dict: # Convert right leaf node to dict
+            node['right'] = {'val' : round(node['right']), 'left' : 0, 'right' : 0, 'mod' : 0, 'shift' : 0, 'x' : 0, 'depth' : node['depth'] + 1}
         else:
             max_depth = max(max_depth, self.pre_pass(node['right'], max_depth))
         return max(max_depth, node['depth'])

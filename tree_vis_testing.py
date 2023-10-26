@@ -25,8 +25,8 @@ from tree_vis import *
 # Naive solution using preorder recursion. Looks bad with deep trees.
 # node: root node of the tree.
 def basic_plot(node, x=0, y=50):
-    if type(node) is int: # Plot leaf node
-        plt.text(x, y, str(node), ha='center', va='center',
+    if not type(node) is dict: # Plot leaf node
+        plt.text(x, y, str(round(node)), ha='center', va='center',
                  bbox={'boxstyle' : 'square', 'ec' : (0, 0, 0), 'fc' : (1, 1, 1)})
     else:
         plt.text(x, y, str(node['split feature']) + ' < ' + str(node['split value']), ha='center', va='center',
@@ -46,14 +46,14 @@ def random_tree(node, p, max_depth):
     if node['depth'] == max_depth:
         return
     if random.random() < p:
-        node['left'] = {'split feature' : 1, 'split value' : 10, 'left' : 0, 'right' : 0, 'depth' : node['depth'] + 1}
+        node['left'] = {'split feature' : 1, 'split value' : 10, 'left' : 0., 'right' : 0., 'depth' : node['depth'] + 1}
         random_tree(node['left'], p, max_depth)
     if random.random() < p:
-        node['right'] = {'split feature' : 1, 'split value' : 10, 'left' : 0, 'right' : 0, 'depth' : node['depth'] + 1}
+        node['right'] = {'split feature' : 1, 'split value' : 10, 'left' : 0., 'right' : 0., 'depth' : node['depth'] + 1}
         random_tree(node['right'], p, max_depth)
 
-root = {'split feature' : 1, 'split value' : 10, 'left' : 0, 'right' : 0, 'depth' : 0}
-random_tree(root, 0.6, 10)
+root = {'split feature' : 1, 'split value' : 10, 'left' : 0., 'right' : 0., 'depth' : 0}
+random_tree(root, 0.6, 9)
 
 # See basic plot first.
 plt.figure()
