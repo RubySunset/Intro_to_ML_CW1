@@ -58,3 +58,19 @@ def recall(confusion): ### Provisional Function
         macro_r = 0
     
     return r, macro_r
+
+# Returns array with F1 scores of each class and macro-averaged F1 score.
+# We define macro-averaged F1 score as being the mean of F1 scores across each class.
+def f1_score(confusion):
+    f = np.zeros(len(confusion))
+    precisions = precision(confusion)[0]
+    recalls = recall(confusion)[0]
+    for i in range(len(confusion)):
+        f[i] = (2*precisions[i]*recalls[i])/(precisions[i]+recalls[i])
+    
+    if len(f)>0:
+        macro_f = np.mean(f)
+    else:
+        macro_f = 0
+    
+    return f, macro_f
