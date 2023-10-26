@@ -8,6 +8,11 @@ def main(dataset_path="wifi_db/clean_dataset.txt"):
     print(dataset_path)
     dataset = read_dataset(dataset_path)
 
+    confusions, accuracies = test_k_folds(dataset)
+
+    print(accuracies[0])
+    print(confusions[0])
+
     return
 
 
@@ -28,13 +33,13 @@ def test_k_folds(dataset, k=10):
     confusions = []
     accuracies = []
 
-    for i, (train_indices, test_indices) in indices_split_folds(k, len(dataset)):
+    for (train_indices, test_indices) in indices_split_folds(k, len(dataset)):
         tree_top = decision_tree_learn(dataset[train_indices])[0] # Trains a tree on one fold iteration
 
         
-        new_confusion, new_accuray = eval.evaluate(dataset[test_indices], tree_top)
+        new_confusion, new_accuracy = eval.evaluate(dataset[test_indices], tree_top)
         confusions.append(new_confusion)
-        accuracies.append(new_accuray)
+        accuracies.append(new_accuracy)
 
     return confusions, accuracies
 
