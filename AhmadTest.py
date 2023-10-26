@@ -1,5 +1,7 @@
 import numpy as np
 import math
+from tree_vis import *
+# from tree_vis_testing import basic_plot
 
 CLEAN_DATA_PATH = "wifi_db/clean_dataset.txt"
 NOISY_DATA_PATH = "wifi_db/noisy_dataset.txt"
@@ -65,11 +67,12 @@ def remainder(S_left, S_right):
 
 
 # Computes the info gain for given subsets. S_all, S_left, S_right are the lists of the labels
-def inormation_gain(S_all, S_left, S_right):
+def information_gain(S_all, S_left, S_right):
     return entropy(S_all) - remainder(S_left, S_right)
 
 
 # Maximises information gain and returns (split_feature, split_value)
+# Try splitting on index and change in label???
 def find_best_split(training_dataset, unique_labels, label_counts):
     best_split = (None, None)
     information_gain_max = 0
@@ -88,7 +91,7 @@ def find_best_split(training_dataset, unique_labels, label_counts):
             if sorted_dataset[j, 0] != sorted_dataset[j+1, 0]:
                 left_labels = sorted_dataset[:j+1, 1]
                 right_labels = sorted_dataset[j+1:, 1]
-                information_gain_new = inormation_gain(sorted_dataset[:, 1], left_labels, right_labels)
+                information_gain_new = information_gain(sorted_dataset[:, 1], left_labels, right_labels)
 
                 if information_gain_new > information_gain_max:
                     information_gain_max = information_gain_new
@@ -127,29 +130,32 @@ def decision_tree_learn(training_dataset, depth=0):
     if len(unique_labels) == 1:
         return (unique_labels[0], depth)
 
-    # Dummy Functions find_split and split_data - FIX LATER
+    # Finds best feature and value to split the dataset and splits it
     split_feature, split_value = find_best_split(training_dataset, unique_labels, label_counts)
     right_dataset, left_dataset = split_data(training_dataset, split_value, split_feature)
 
+    # Creates the current node, and recurses over right and left children
     node = create_node(split_feature, split_value, node_depth=depth)
     node["right"], right_depth = decision_tree_learn(right_dataset, depth+1)
     node["left"], left_depth = decision_tree_learn(left_dataset, depth+1)
 
-    # Alternative methods
+    # Alternative method
     # right_child, right_depth = decision_tree_learn(right_dataset, depth+1)
     # left_child, left_depth = decision_tree_learn(left_dataset, depth+1)
     # node = create_node(split_feature, split_value, right_child, left_child, depth)
-    # node = {
-    #     "split feature": split_feature,
-    #     "split value": split_value,
-    #     "right": right_child,
-    #     "left": left_child,
-    #     "depth": depth,
-    # }
 
     return (node, max(right_depth, left_depth))
 
 
 tree, depth = decision_tree_learn(read_dataset(CLEAN_DATA_PATH))
-print(tree_to_string(tree))
 print("Max Depth:", depth)
+print(tree_to_string(tree))
+
+# See basic plot first.
+# plt.figure()
+# plt.axis('off')
+# basic_plot(tree)
+
+# Compare to Reingold-Tilford algorithm.
+vis = TreeVis()
+vis.draw(tree)
