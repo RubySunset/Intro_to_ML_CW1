@@ -45,27 +45,26 @@ def tree_to_string(tree, depth=0):
     return string
 
 
-# Change the variables as you like to match the rest of the code if you want
-# Compute the Entropy of a subset S, where S is a list of labels
+# Computes the Entropy of a subset S, where S is a list of labels
 def entropy(S):
     total_samples = len(S)
     unique_labels = set(S)
-    entropy_val = 0
+    entropy_value = 0
 
     for label in unique_labels:
         p_k = np.count_nonzero(S == label) / total_samples
-        entropy_val -= p_k * math.log2(p_k)
+        entropy_value -= p_k * math.log2(p_k)
 
-    return entropy_val
+    return entropy_value
 
 
-# Computing the remainder for subsets S_left and S_right
+# Computes the remainder for subsets S_left and S_right
 def remainder(S_left, S_right):
     total_samples = (S_left.shape[0]) + (S_right.shape[0])
     return (S_left.shape[0] / total_samples) * entropy(S_left) + (S_right.shape[0] / total_samples * entropy(S_right))
 
 
-# Computing the info gain for given subsets. S_all, S_left, S_right are the lists of the labels
+# Computes the info gain for given subsets. S_all, S_left, S_right are the lists of the labels
 def inormation_gain(S_all, S_left, S_right):
     return entropy(S_all) - remainder(S_left, S_right)
 
@@ -97,14 +96,13 @@ def find_best_split(training_dataset, unique_labels, label_counts):
                     split_value = (sorted_dataset[j][0] + sorted_dataset[j+1][0]) / 2
                     best_split = (i, split_value)
                     # print(f'Info Gain: {information_gain_new}, Split Value: {split_value}, Index: {i, j}')
-                    continue
 
     return best_split
 
 
-# DUMMY FUNCTION
+# Splits the dataset based on feature and value
 def split_data(dataset, split_value, split_feature):
-    right_dataset = dataset[dataset[:, split_feature] > split_value ]
+    right_dataset = dataset[dataset[:, split_feature] > split_value]
     left_dataset = dataset[dataset[:, split_feature] < split_value]
     return (right_dataset, left_dataset)
 
@@ -155,4 +153,3 @@ def decision_tree_learn(training_dataset, depth=0):
 tree, depth = decision_tree_learn(read_dataset(CLEAN_DATA_PATH))
 print(tree_to_string(tree))
 print("Max Depth:", depth)
-# print(tree_to_string(decision_tree_learn(read_dataset(CLEAN_DATA_PATH)[:1001, :])[0], ))
