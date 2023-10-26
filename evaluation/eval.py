@@ -1,34 +1,35 @@
 import numpy as np
 
-# Recursive function to classify and return label of a single row of attributes
-def classify(attributes, tree): ### This function is provisional: modify to fit tree structure and check syntax
-    if attributes[tree["split feature"]] < tree["split value"]:
-        if type(tree["right"]).__name__ == 'int': ### This assumes that label stored as int in dictionary
+# Recursive function to classify and return predicted label of a single row of attributes
+def classify(attributes, tree):
+
+    if attributes[tree["split feature"]] > tree["split value"]:
+        if type(tree["right"]).__name__ == 'float64': #The label is stored as float64 in dictionary.
             return tree["right"]
         else:
             return classify(attributes, tree["right"])
     else:
-        if type(tree["left"]).__name__ == 'int':
+        if type(tree["left"]).__name__ == 'float64':
             return tree["left"]
         else:
             return classify(attributes, tree["left"])
 
 # Evaluates the 4x4 confusion matrix of the trained tree against test_db, and also returns accuracy
-def evaluate(test_db, trained_tree): ### This function is still provisional: Correctness is not yet determined
+def evaluate(test_db, trained_tree):
     confusion = np.zeros((4, 4), dtype=np.int)
-    for i in range(len(test_db)): ### For each row in test_db, predict and change confusion matrix
-        prediction = classify(test_db[i, :6], trained_tree) # The attributes passed to classify function shouldn't include the label
+    for i in range(len(test_db)): # For each row in test_db, predict and change confusion matrix
+        prediction = classify(test_db[i, :7], trained_tree) # The attributes passed to classify function shouldn't include the label
         if (prediction == test_db[i, 7]):
-            confusion[prediction, prediction] += 1
+            confusion[int(prediction)-1, int(prediction)-1] += 1
         else:
-            confusion[test_db[i, 7], prediction] += 1 # rows of confusion matrix are actual classes and columns are predicted classes
+            confusion[int(test_db[i, 7])-1, int(prediction)-1] += 1 # rows of confusion matrix are actual classes and columns are predicted classes
 
     if np.sum(confusion) > 0:
         accuracy = np.trace(confusion)/np.sum(confusion)
     else:
         accuracy = 0
 
-    return accuracy, confusion ### Does this need to be returned as tuple as done in the lab?
+    return accuracy, confusion
 
 # Returns array with precision of each class and the macro-averaged precision
 def precision(confusion): ### Provisional Function
@@ -61,7 +62,7 @@ def recall(confusion): ### Provisional Function
 
 # Returns array with F1 scores of each class and macro-averaged F1 score.
 # We define macro-averaged F1 score as being the mean of F1 scores across each class.
-def f1_score(confusion):
+def f1_score_confusion(confusion):
     f = np.zeros(len(confusion))
     precisions = precision(confusion)[0]
     recalls = recall(confusion)[0]
@@ -74,3 +75,6 @@ def f1_score(confusion):
         macro_f = 0
     
     return f, macro_f
+
+def f1_score_class(precision, recall):
+    return ((2*precision*recall)/(precision+recall))

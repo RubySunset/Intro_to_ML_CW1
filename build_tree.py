@@ -147,15 +147,15 @@ def decision_tree_learn(training_dataset, depth=0):
     return (node, max(right_depth, left_depth))
 
 
-tree, depth = decision_tree_learn(read_dataset(CLEAN_DATA_PATH))
-print("Max Depth:", depth)
-print(tree_to_string(tree))
+# tree, depth = decision_tree_learn(read_dataset(CLEAN_DATA_PATH))
+# print("Max Depth:", depth)
+# print(tree_to_string(tree))
 
-# See basic plot first.
-# plt.figure()
-# plt.axis('off')
-# basic_plot(tree)
+# # See basic plot first.
+# # plt.figure()
+# # plt.axis('off')
+# # basic_plot(tree)
 
-# Compare to Reingold-Tilford algorithm.
-vis = TreeVis()
-vis.draw(tree)
+# # Compare to Reingold-Tilford algorithm.
+# vis = TreeVis()
+# vis.draw(tree)
