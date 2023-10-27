@@ -1,6 +1,7 @@
 import random
 from tree_vis import *
 
+# We can test using this manually defined tree if desired.
 # root = {'split feature' : 0, 'split value' : 5,
 #         'left' : {
 #             'split feature' : 1, 'split value' : 10, 'left' : 0, 'right' : {
@@ -52,6 +53,7 @@ def random_tree(node, p, max_depth):
         node['right'] = {'split feature' : 1, 'split value' : 10, 'left' : 0., 'right' : 0., 'depth' : node['depth'] + 1}
         random_tree(node['right'], p, max_depth)
 
+# Generate a random tree from the root.
 root = {'split feature' : 1, 'split value' : 10, 'left' : 0., 'right' : 0., 'depth' : 0}
 random_tree(root, 0.6, 9)
 

@@ -1,11 +1,18 @@
 import numpy as np
 from evaluation.k_folds import test_k_folds
 import evaluation.eval as eval
+from build_tree import decision_tree_learn
+from tree_vis import TreeVis
 
 
-def main(dataset_path="wifi_db/clean_dataset.txt"):
+def train_and_test(dataset_path="wifi_db/clean_dataset.txt"):
     print("Decision trees trained on: " + dataset_path)
-    dataset = read_dataset(dataset_path)
+
+    try:
+        dataset = read_dataset(dataset_path)
+    except FileNotFoundError:
+        print('File not found.')
+        return
 
     # confusions is an array of confusion matrices. accuracies is also an array.
     accuracies, confusions  = test_k_folds(dataset) 
@@ -100,20 +107,29 @@ def read_dataset(filepath):
     return (dataset)
 
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
 
-    choice = input("""Which dataset do you want to test the algorithm on?
-                        Options:
-                        - Clean
-                        - Noisy
-                        - [insert own filepath]
-                        """)
-    
-    if choice == "Clean" or choice == "1":
-        dataset_path = "wifi_db/clean_dataset.txt"
-    elif choice == "Noisy" or choice =="2":
-        dataset_path = "wifi_db/noisy_dataset.txt"
-    else:
-        dataset_path = choice
-
-    main(dataset_path)
+    vis = TreeVis()
+    while True:
+        choice = input("""Options (enter number or own filepath):
+                    1. Test algorithm on clean dataset
+                    2. Test algorithm on noisy dataset
+                    3. Visualise tree on entire clean dataset
+                    4. Exit
+                    (otherwise test algorithm on own dataset)
+                    """)
+        if choice in ('3', 'Visualise'):
+            dataset = read_dataset('wifi_db/clean_dataset.txt')
+            root, depth = decision_tree_learn(dataset)
+            vis.draw(root)
+        elif choice == '4':
+            exit()
+        else:
+            if choice in ('1', 'Clean'):
+                dataset_path = "wifi_db/clean_dataset.txt"
+            elif choice in ('2', 'Noisy'):
+                dataset_path = "wifi_db/noisy_dataset.txt"
+            else:
+                dataset_path = choice
+            train_and_test(dataset_path)
+        print('\n' * 2)

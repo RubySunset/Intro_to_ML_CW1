@@ -38,12 +38,14 @@ class TreeVis:
         node['shift'] = 0
         # Consider left subtree.
         if not type(node['left']) is dict: # Convert left leaf node to dict
-            node['left'] = {'val' : round(node['left']), 'left' : 0, 'right' : 0, 'mod' : 0, 'shift' : 0, 'x' : 0, 'depth' : node['depth'] + 1}
+            node['left'] = {'val' : round(node['left']), 'left' : 0, 'right' : 0,
+                            'mod' : 0, 'shift' : 0, 'x' : 0, 'depth' : node['depth'] + 1}
         else:
             max_depth = max(max_depth, self.pre_pass(node['left'], max_depth))
         # Consider right subtree.
         if not type(node['right']) is dict: # Convert right leaf node to dict
-            node['right'] = {'val' : round(node['right']), 'left' : 0, 'right' : 0, 'mod' : 0, 'shift' : 0, 'x' : 0, 'depth' : node['depth'] + 1}
+            node['right'] = {'val' : round(node['right']), 'left' : 0, 'right' : 0,
+                             'mod' : 0, 'shift' : 0, 'x' : 0, 'depth' : node['depth'] + 1}
         else:
             max_depth = max(max_depth, self.pre_pass(node['right'], max_depth))
         return max(max_depth, node['depth'])
@@ -73,25 +75,27 @@ class TreeVis:
     def first_pass(self, node, max_depth):
         if self.is_leaf(node):
             return
+        left = node['left']
+        right = node['right']
         # Postorder traversal.
-        self.first_pass(node['left'], max_depth)
-        self.first_pass(node['right'], max_depth)
+        self.first_pass(left, max_depth)
+        self.first_pass(right, max_depth)
         # Consider left subtree.
-        if self.is_leaf(node['left']):
-            node['left']['x'] = 0
+        if self.is_leaf(left):
+            left['x'] = 0
         else:
-            node['left']['x'] = (node['left']['left']['x'] + node['left']['right']['x'] + node['left']['right']['shift']) / 2
+            left['x'] = (left['left']['x'] + left['right']['x'] + left['right']['shift']) / 2
         # Consider right subtree.
-        node['right']['x'] = node['left']['x'] + self.SIBLING_SEP
-        if not self.is_leaf(node['right']):
-            node['right']['mod'] = node['right']['x'] - (node['right']['left']['x'] + node['right']['right']['x'] + node['right']['right']['shift']) / 2
+        right['x'] = node['left']['x'] + self.SIBLING_SEP
+        if not self.is_leaf(right):
+            right['mod'] = right['x'] - (right['left']['x'] + right['right']['x'] + right['right']['shift']) / 2
         # Find contours.
         starting_depth = node['depth'] + 1
         contour_size = max_depth - starting_depth + 1
         right_contour = [-1] * contour_size
         left_contour = [-1] * contour_size
-        self.find_contour(node['left'], starting_depth, right_contour, 0, 0, True)
-        self.find_contour(node['right'], starting_depth, left_contour, 0, 0, False)
+        self.find_contour(left, starting_depth, right_contour, 0, 0, True)
+        self.find_contour(right, starting_depth, left_contour, 0, 0, False)
         # Compute needed shift.
         max_shift = 0
         for i in range(contour_size):
@@ -100,7 +104,7 @@ class TreeVis:
             shift = right_contour[i] - left_contour[i] + self.SUBTREE_SEP # Leave space between nodes.
             if shift > max_shift:
                 max_shift = shift
-        node['right']['shift'] = max_shift
+        right['shift'] = max_shift
 
     # Second pass of the Reingold-Tilford algorithm. Applies mod and shift to x values, and also records the min value of x (if negative).
     # node: root node of the tree.
@@ -139,12 +143,14 @@ class TreeVis:
                     ha='center', va='center', size='small',
                     bbox={'boxstyle' : 'square', 'ec' : (0, 0, 0), 'fc' : (1, 1, 1)})
         else:
-            plt.text(node['x'], self.LAYER_SEP * (max_depth - node['depth']), '[X' + str(node['split feature']) + ' < ' + str(node['split value']) + ']',
-                    ha='center', va='center', size='small',
-                    bbox={'boxstyle' : 'square', 'ec' : (0, 0, 0), 'fc' : (1, 1, 1)})
+            plt.text(node['x'], self.LAYER_SEP * (max_depth - node['depth']),
+                     '[X' + str(node['split feature']) + ' < ' + str(node['split value']) + ']',
+                     ha='center', va='center', size='small',
+                     bbox={'boxstyle' : 'square', 'ec' : (0, 0, 0), 'fc' : (1, 1, 1)})
             plt.plot((node['left']['x'], node['x'], node['right']['x']),
-                    (self.LAYER_SEP * (max_depth - node['left']['depth']), self.LAYER_SEP * (max_depth - node['depth']), self.LAYER_SEP * (max_depth - node['right']['depth'])),
-                    color=colours[node['depth']])
+                     (self.LAYER_SEP * (max_depth - node['left']['depth']),
+                     self.LAYER_SEP * (max_depth - node['depth']), self.LAYER_SEP * (max_depth - node['right']['depth'])),
+                     color=colours[node['depth']])
             self.recursive_plot(node['left'], max_depth, colours)
             self.recursive_plot(node['right'], max_depth, colours)
 
