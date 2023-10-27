@@ -16,7 +16,7 @@ def classify(attributes, tree):
 
 # Evaluates the 4x4 confusion matrix of the trained tree against test_db, and also returns accuracy
 def evaluate(test_db, trained_tree):
-    confusion = np.zeros((4, 4), dtype=np.int)
+    confusion = np.zeros((4, 4), dtype=np.int32)
     for i in range(len(test_db)): # For each row in test_db, predict and change confusion matrix
         prediction = classify(test_db[i, :7], trained_tree) # The attributes passed to classify function shouldn't include the label
         if (prediction == test_db[i, 7]):
