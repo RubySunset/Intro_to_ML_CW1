@@ -14,7 +14,7 @@ def main(dataset_path="wifi_db/clean_dataset.txt"):
     print("Accuracy average: " + str(accuracy_avg))
     
     # Combined confusion matrix is the matrix obtained from the sum of all the confusion matrices
-    combined_confusion = np.zeros((4, 4), dtype=int)
+    combined_confusion = np.zeros((4, 4), dtype=np.int32)
     for matrix in confusions:
         combined_confusion += matrix
     
