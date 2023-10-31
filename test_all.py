@@ -15,6 +15,7 @@ def train_and_test(dataset_path="wifi_db/clean_dataset.txt"):
         return
 
     # confusions is an array of confusion matrices. accuracies is also an array.
+    # Both have a length equal to number of folds.
     accuracies, confusions  = test_k_folds(dataset) 
 
     accuracy_avg = np.mean(accuracies)
@@ -34,13 +35,19 @@ def train_and_test(dataset_path="wifi_db/clean_dataset.txt"):
     recalls_matrix = np.zeros((4, len(confusions)))
     f1_matrix = np.zeros((4, len(confusions)))
 
+    # These will store the macro-averaged metrics for each fold.
+    macro_precision = np.zeros(len(confusions))
+    macro_recall = np.zeros(len(confusions))
+    macro_f1 = np.zeros(len(confusions))
+
     for i, matrix in enumerate(confusions):
-        new_precisions = eval.precision(matrix)[0]
-        new_recalls = eval.recall(matrix)[0]
+        new_precisions, macro_precision[i] = eval.precision(matrix)
+        new_recalls, macro_recall[i] = eval.recall(matrix)
         for class_n in range(len(confusions[0])):
             precisions_matrix[class_n, i] = new_precisions[class_n] # Precision of class class_n+1 becomes a part of precisions matrix.
             recalls_matrix[class_n, i] = new_recalls[class_n]
             f1_matrix[class_n, i] = eval.f1_score_class(new_precisions[class_n], new_recalls[class_n])
+        macro_f1[i] = np.mean(f1_matrix[:, i])
 
     
     precision_matrix_avg = []
@@ -58,6 +65,11 @@ def train_and_test(dataset_path="wifi_db/clean_dataset.txt"):
     print(recall_matrix_avg)
     print("Averaged F1 score per class: ")
     print(f1_matrix_avg)
+    print("\n")
+    print("Averaged macro-averaged metrics: ")
+    print("Precision: ", np.mean(macro_precision))
+    print("Recall: ", np.mean(macro_recall))
+    print("F1-score: ", np.mean(macro_f1))
 
     ### These are calculations done by using the combined confusion matrix.
     ### The preferred averages are by averaging the individual metrics from each tree iteration.
