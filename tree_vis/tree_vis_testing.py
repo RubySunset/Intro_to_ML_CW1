@@ -1,4 +1,5 @@
 import random
+import matplotlib.pyplot as plt
 from tree_vis import *
 
 # We can test using this manually defined tree if desired.
@@ -40,22 +41,23 @@ def basic_plot(node, x=0, y=50):
         basic_plot(node['right'], x_right, y_next)
 
 # Generate a random tree.
-# node: the root node to start the tree from.
 # p: the probability that a left/right child will be created for a current leaf node.
 # max_depth: the maximum depth the tree is allowed to reach.
-def random_tree(node, p, max_depth):
+def random_tree(p, max_depth, node=None):
+    if node == None:
+        node = {'split feature' : 1, 'split value' : 10, 'left' : 0., 'right' : 0., 'depth' : 0}
     if node['depth'] == max_depth:
         return
     if random.random() < p:
         node['left'] = {'split feature' : 1, 'split value' : 10, 'left' : 0., 'right' : 0., 'depth' : node['depth'] + 1}
-        random_tree(node['left'], p, max_depth)
+        random_tree(p, max_depth, node['left'])
     if random.random() < p:
         node['right'] = {'split feature' : 1, 'split value' : 10, 'left' : 0., 'right' : 0., 'depth' : node['depth'] + 1}
-        random_tree(node['right'], p, max_depth)
+        random_tree(p, max_depth, node['right'])
+    return node
 
 # Generate a random tree from the root.
-root = {'split feature' : 1, 'split value' : 10, 'left' : 0., 'right' : 0., 'depth' : 0}
-random_tree(root, 0.6, 9)
+root = random_tree(0.5, 9)
 
 # See basic plot first.
 plt.figure()

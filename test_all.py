@@ -2,7 +2,7 @@ import numpy as np
 from evaluation.k_folds import test_k_folds
 import evaluation.eval as eval
 from build_tree import decision_tree_learn
-from tree_vis import TreeVis
+from tree_vis.tree_vis import TreeVis
 
 
 def train_and_test(dataset_path="wifi_db/clean_dataset.txt"):

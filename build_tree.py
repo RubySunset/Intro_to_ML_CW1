@@ -1,7 +1,6 @@
 import numpy as np
 import math
-from tree_vis import *
-# from tree_vis_testing import basic_plot
+from tree_vis.tree_vis import *
 
 CLEAN_DATA_PATH = "wifi_db/clean_dataset.txt"
 NOISY_DATA_PATH = "wifi_db/noisy_dataset.txt"
