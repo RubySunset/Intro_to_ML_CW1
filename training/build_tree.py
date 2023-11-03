@@ -97,6 +97,7 @@ def read_dataset(filepath):
 
 # Builds the decision tree and returns the root node
 def decision_tree_learn(training_dataset, depth=0):
+
     dataset_labels = training_dataset[:, -1]
     unique_labels, label_counts = np.unique(dataset_labels, return_counts=True)
 

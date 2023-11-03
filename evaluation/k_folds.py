@@ -7,6 +7,7 @@ from evaluation.eval_tree import evaluate
 
 # Shuffles indices up to instances_n, splits them and organises all the folds
 def indices_split_folds(fold_n, instances_n):
+
     shuffled = default_rng().permutation(instances_n)
     splits   = np.array_split(shuffled, fold_n)
 
@@ -19,8 +20,9 @@ def indices_split_folds(fold_n, instances_n):
     return folds
 
 
-# Splits the data into training and validation sets based on k folds
+# Splits the data into training and validation sets based on k-1 folds
 def validation_training_split(train_indices, k=10):
+
     validation_folds = []
     split_train = np.array_split(train_indices, k-1)
     for i in range(k-1):
@@ -33,6 +35,7 @@ def validation_training_split(train_indices, k=10):
 
 # Trains and tests k trees. Returns 2 arrays of dimension k with each accuracy and confusion matrix
 def test_k_folds(dataset, k=10):
+
     confusions = []
     accuracies = []
 
@@ -50,8 +53,9 @@ def test_k_folds(dataset, k=10):
     return accuracies, confusions
 
 
-# Trains and tests k trees. Returns 2 arrays of dimension k with each accuracy and confusion matrix and the best tree
+# Trains, prunes and tests k trees. Returns 2 arrays of dimension k with each accuracy and confusion matrix and the best pruned tree
 def test_k_folds_pruning(dataset, k=10):
+
     test_confusions = []
     test_accuracies = []
     best_test_tree = {}
