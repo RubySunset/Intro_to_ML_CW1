@@ -48,6 +48,13 @@ def test_k_folds(dataset, k=10):
         new_accuracy, new_confusion  = evaluate(dataset[test_indices], tree_top)
         confusions.append(new_confusion)
         accuracies.append(new_accuracy)
+        
+        print(f'''
+            ################################################
+                    Latest Test Fold Accuracy: {new_accuracy}
+                    Best Test Fold Accuracy:   {max(accuracies)}   
+            ################################################
+        ''')
 
     # Returns an array of all the calculated accuracies and confusions
     return accuracies, confusions
@@ -86,10 +93,18 @@ def test_k_folds_pruning(dataset, k=10):
         test_accuracies.append(test_accuracy)
         test_confusions.append(test_confusion)       
         
+        
         # Stores the best accuracy and corresponding tree over all test folds
         if test_accuracy > best_test_accuracy:
             best_test_accuracy = test_accuracy
             best_test_tree = best_validation_tree
+
+        print(f'''
+            ################################################
+                    Latest Test Fold Accuracy: {test_accuracy}
+                    Best Test Fold Accuracy:   {best_test_accuracy}   
+            ################################################
+        ''')
 
     # Returns an array of all the calculated test accuracies and confusions as well as the most accurate tree
     return test_accuracies, test_confusions, best_test_tree
