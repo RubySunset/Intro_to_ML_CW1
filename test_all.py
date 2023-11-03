@@ -1,7 +1,7 @@
 import numpy as np
-from tree_vis import TreeVis
-from evaluation.eval import *
-from build_tree import decision_tree_learn
+from evaluation.eval_tree import *
+from visualisation.tree_vis import TreeVis
+from training.build_tree import decision_tree_learn
 from evaluation.k_folds import test_k_folds, test_k_folds_pruning
 
 
@@ -20,17 +20,15 @@ def train_and_test(dataset_path="wifi_db/clean_dataset.txt", prune=False):
         accuracies, confusions, _ = test_k_folds_pruning(dataset)
     else:
         accuracies, confusions  = test_k_folds(dataset) 
-        
-    print("\nFull Accuracies:", accuracies)
 
     accuracy_avg = np.mean(accuracies)
     print("\nAccuracy average: " + str(accuracy_avg))
-    
+
     # Combined confusion matrix is the matrix obtained from the sum of all the confusion matrices
     combined_confusion = np.zeros((4, 4), dtype=np.int32)
     for matrix in confusions:
         combined_confusion += matrix
-    
+
     print("\nSum Confusion: ")
     print(combined_confusion)
     print("")
@@ -49,12 +47,12 @@ def train_and_test(dataset_path="wifi_db/clean_dataset.txt", prune=False):
         new_precisions, macro_precision[i] = precision(matrix)
         new_recalls, macro_recall[i] = recall(matrix)
         for class_n in range(len(confusions[0])):
-            precisions_matrix[class_n, i] = new_precisions[class_n] # Precision of class class_n+1 becomes a part of precisions matrix.
+            # Precision of class class_n+1 becomes a part of precisions matrix.
+            precisions_matrix[class_n, i] = new_precisions[class_n]
             recalls_matrix[class_n, i] = new_recalls[class_n]
             f1_matrix[class_n, i] = f1_score_class(new_precisions[class_n], new_recalls[class_n])
         macro_f1[i] = np.mean(f1_matrix[:, i])
 
-    
     precision_matrix_avg = []
     recall_matrix_avg = []
     f1_matrix_avg = []
@@ -62,7 +60,6 @@ def train_and_test(dataset_path="wifi_db/clean_dataset.txt", prune=False):
         precision_matrix_avg.append(np.mean(class_n_p))
         recall_matrix_avg.append(np.mean(class_n_r))
         f1_matrix_avg.append(np.mean(class_n_ef))
-        
 
     print("Averaged precision per class: ")
     print(precision_matrix_avg)
@@ -76,25 +73,12 @@ def train_and_test(dataset_path="wifi_db/clean_dataset.txt", prune=False):
     print("Recall: ", np.mean(macro_recall))
     print("F1-score: ", np.mean(macro_f1))
 
-    ### These are calculations done by using the combined confusion matrix.
-    ### The preferred averages are by averaging the individual metrics from each tree iteration.
-    # confusion_accuracy = np.trace(combined_confusion)/np.sum(combined_confusion)
-    # print("\nAccuracy from confusion: " + str(confusion_accuracy)) # This is the same as average accuracy
-
-    # combined_precisions, precision_avg = precision(combined_confusion)
-    # combined_recalls, recall_avg = recall(combined_confusion)
-
-    # print("Combined averaged precisions: ")
-    # print(combined_precisions)
-
-    # print("Combined average recalls: ")
-    # print(combined_recalls)
-
     return
 
 
 # Returns a numpy.array of the data and labels
 def read_dataset(filepath):
+
     dataset = []
     for line in open(filepath):
         if line != "":
@@ -107,6 +91,8 @@ def read_dataset(filepath):
 
 if __name__ == "__main__":
     vis = TreeVis()
+    
+    # Displays Options Menu
     while True:
         choice = int(input("""Options (enter number): 
                     1. Test base algortihm on clean dataset

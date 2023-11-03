@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 
 # Note: leaf nodes are represented as a numpy float (need to round to int)
 
+
 class TreeVis:
 
     SIBLING_SEP = 100 # Minimum separation between siblings.
@@ -18,10 +19,6 @@ class TreeVis:
     LAYER_SEP = 100 # Separation between adjacent layers.
     MIN_COLOUR = 0.0 # Minimum value for RGB when plotting lines.
     MAX_COLOUR = 0.8 # Maximum value for RGB when plotting lines.
-
-
-    def __init__(self):
-        pass
 
 
     # Returns true if the node is a leaf, otherwise false.
@@ -52,6 +49,7 @@ class TreeVis:
                              'mod' : 0, 'shift' : 0, 'x' : 0, 'depth' : node['depth'] + 1}
         else:
             max_depth = max(max_depth, self.pre_pass(node['right'], max_depth))
+
         return max(max_depth, node['depth'])
 
 
