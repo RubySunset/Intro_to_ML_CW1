@@ -14,6 +14,7 @@ $ python3 test.py
   - Average precision and recall per class (room).
   - Average F1 score per class. This is done by calculating the F1 score per class for each fold, then finding the average across folds.
 - `__name__ == "__main__"` This initialiser allows the user to train and test or visualise the tree on a clean or noisy dataset using both the base trained and the pruned versions of the tree.
+- Note that visualising the tree will show the plot and also save it in `plot.png`.
 
 
 
@@ -51,6 +52,7 @@ This folder contains the TreeVis class for tree visualisation, and a randomised 
 - The TreeVis class is instantiated as `vis = TreeVis()`.
 - To draw a tree starting from a root node `root`, call `vis.draw(root)`.
 - The plot is blocking, and will suspend execution until closed.
+- The plot is also saved in `plot.png`.
 
 #### [tree_vis_testing.py](visualisation/tree_vis_testing.py)
 - `basic_plot(root)` Plots a tree from the given root using the naive recursive algorithm (distance between adjacent nodes halves for each layer). For comparison purposes.

@@ -62,7 +62,7 @@ def random_tree(p, max_depth, node=None):
     return node
 
 # Generate a random tree from the root.
-root = random_tree(0.5, 9)
+root = random_tree(0.5, 10)
 
 # See basic plot first.
 plt.figure()

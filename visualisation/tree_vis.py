@@ -14,9 +14,9 @@ import matplotlib.pyplot as plt
 
 class TreeVis:
 
-    SIBLING_SEP = 100 # Minimum separation between siblings.
-    SUBTREE_SEP = 100 # Minimum separation between the closest nodes of two adjacent subtrees.
-    LAYER_SEP = 100 # Separation between adjacent layers.
+    SIBLING_SEP = 1 # Minimum separation between siblings.
+    SUBTREE_SEP = 1 # Minimum separation between the closest nodes of two adjacent subtrees.
+    LAYER_SEP = 1 # Separation between adjacent layers.
     MIN_COLOUR = 0.0 # Minimum value for RGB when plotting lines.
     MAX_COLOUR = 0.8 # Maximum value for RGB when plotting lines.
 
@@ -119,25 +119,29 @@ class TreeVis:
         right['shift'] = max_shift
 
 
-    # Second pass of the Reingold-Tilford algorithm. Applies mod and shift to x values, and also records the min value of x (if negative).
+    # Second pass of the Reingold-Tilford algorithm. Applies mod and shift to x values, and also records the min and max values of x.
     # node: root node of the tree.
     # total_mod: running count of the addition to the x value from mod.
     # total_shift: running count of the addition to the x value from shift.
     # min_x: the minimum x value found so far.
-    # Returns minimum x value.
-    def second_pass(self, node, total_mod, total_shift, min_x):
+    # max_x: the maximum x value found so far.
+    # Returns min and max x values.
+    def second_pass(self, node, total_mod, total_shift, min_x, max_x):
 
         # Apply shift, check min x, then apply mod.
         total_shift += node['shift']
         node['x'] += total_mod + total_shift
         if node['x'] < min_x:
             min_x = node['x']
+        if node['x'] > max_x:
+            max_x = node['x']
         total_mod += node['mod']
         if not self.is_leaf(node):
-            min_x_1 = self.second_pass(node['left'], total_mod, total_shift, min_x)
-            min_x_2 = self.second_pass(node['right'], total_mod, total_shift, min_x)
+            min_x_1, max_x_1 = self.second_pass(node['left'], total_mod, total_shift, min_x, max_x)
+            min_x_2, max_x_2 = self.second_pass(node['right'], total_mod, total_shift, min_x, max_x)
             min_x = min(min_x_1, min_x_2)
-        return min_x
+            max_x = max(max_x_1, max_x_2)
+        return min_x, max_x
 
 
     # Third pass of the Reingold-Tilford algorithm. Shifts the tree to make all x values positive.
@@ -177,24 +181,23 @@ class TreeVis:
     # root: root node of the tree.
     def draw(self, root):
 
-        # Set up plot.
-        plt.figure()
-        plt.axis('off')
-
         # Apply Reingold-Tilford algorithm.
         new_root = copy.deepcopy(root) # Make a copy of the tree since we will modify its structure in preprocessing
         max_depth = self.pre_pass(new_root) + 1 # Add one since max_depth refers to node before leaf node
         self.first_pass(new_root, max_depth)
         new_root['x'] = (new_root['left']['x'] + new_root['right']['x'] + new_root['right']['shift']) / 2 # Centre the root node
-        min_x = self.second_pass(new_root, 0, 0, 0)
+        min_x, max_x = self.second_pass(new_root, 0, 0, 0, 0)
         if min_x < 0: # Only bother adjusting if we have a negative x value somewhere
             self.third_pass(new_root, -min_x)
 
-        # Draw plot.
+        # Generate some random colours for each level of edges.
         colours = []
         for i in range(max_depth + 1):
-            # Generate some random colours for each level of edges.
             colours.append((random.uniform(self.MIN_COLOUR, self.MAX_COLOUR), random.uniform(self.MIN_COLOUR, self.MAX_COLOUR), random.uniform(self.MIN_COLOUR, self.MAX_COLOUR)))
-            
+        
+        # Draw plot.
+        plt.figure(figsize=(min(max_x - min_x, 100), min(max_depth * self.LAYER_SEP, 100)), dpi=100)
+        plt.axis('off')
         self.recursive_plot(new_root, max_depth, colours)
+        plt.savefig('plot.png', dpi=100)
         plt.show()
