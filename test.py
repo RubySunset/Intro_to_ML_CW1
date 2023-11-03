@@ -73,8 +73,6 @@ def train_and_test(dataset_path="wifi_db/clean_dataset.txt", prune=False):
     print("Recall: ", np.mean(macro_recall))
     print("F1-score: ", np.mean(macro_f1))
 
-    return
-
 
 # Returns a numpy.array of the data and labels
 def read_dataset(filepath):
@@ -86,7 +84,7 @@ def read_dataset(filepath):
             dataset.append(list(map(float, row)))
 
     dataset = np.array(dataset)
-    return (dataset)
+    return dataset
 
 
 if __name__ == "__main__":
@@ -94,18 +92,27 @@ if __name__ == "__main__":
     
     # Displays Options Menu
     while True:
-        choice = int(input("""Options (enter number): 
-                    1. Test base algortihm on clean dataset
-                    2. Test base algorithm on noisy dataset
-                    3. Test pruned version on clean dataset
-                    4. Test pruned version on noisy dataset
-                    5. Visualise base tree on clean dataset
-                    6. Visualise base tree on noisy dataset
-                    7. Visualise pruned tree on clean dataset
-                    8. Visualise pruned tree on noisy dataset
-                    9. Exit
-                    (otherwise test algorithm on own dataset)
-                    """))
+
+        try:
+            choice = int(input("""Options (enter number): 
+                        1. Test base algortihm on clean dataset
+                        2. Test base algorithm on noisy dataset
+                        3. Test pruned version on clean dataset
+                        4. Test pruned version on noisy dataset
+                        5. Visualise base tree on clean dataset
+                        6. Visualise base tree on noisy dataset
+                        7. Visualise pruned tree on clean dataset
+                        8. Visualise pruned tree on noisy dataset
+                        9. Exit
+                        """))
+        except ValueError:
+            print("Please enter a number.")
+            continue
+        
+        if choice < 1 or choice > 9:
+            print("Please enter a valid number.")
+            continue
+        
         # Exit
         if choice == 9:
             exit()
@@ -127,5 +134,5 @@ if __name__ == "__main__":
             dataset = read_dataset(dataset_path)
             root = test_k_folds_pruning(dataset)[2]
             vis.draw(root)
-            
+        
         print('\n' * 2)
