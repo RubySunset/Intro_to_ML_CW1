@@ -18,11 +18,11 @@ def classify(attributes, tree):
 def evaluate(test_db, trained_tree):
     confusion = np.zeros((4, 4), dtype=np.int32)
     for i in range(len(test_db)): # For each row in test_db, predict and change confusion matrix
-        prediction = classify(test_db[i, :7], trained_tree) # The attributes passed to classify function shouldn't include the label
-        if (prediction == test_db[i, 7]):
+        prediction = classify(test_db[i, :-1], trained_tree) # The attributes passed to classify function shouldn't include the label
+        if (prediction == test_db[i, -1]):
             confusion[int(prediction)-1, int(prediction)-1] += 1
         else:
-            confusion[int(test_db[i, 7])-1, int(prediction)-1] += 1 # rows of confusion matrix are actual classes and columns are predicted classes
+            confusion[int(test_db[i, -1])-1, int(prediction)-1] += 1 # rows of confusion matrix are actual classes and columns are predicted classes
 
     if np.sum(confusion) > 0:
         accuracy = np.trace(confusion)/np.sum(confusion)

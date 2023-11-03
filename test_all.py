@@ -1,13 +1,13 @@
 import numpy as np
-from evaluation.k_folds import test_k_folds
-import evaluation.eval as eval
-from build_tree import decision_tree_learn
 from tree_vis import TreeVis
+from evaluation.eval import *
+from build_tree import decision_tree_learn
+from evaluation.k_folds import test_k_folds, test_k_folds_pruning
 
 
-def train_and_test(dataset_path="wifi_db/clean_dataset.txt"):
+def train_and_test(dataset_path="wifi_db/clean_dataset.txt", prune=False):
+    
     print("Decision trees trained on: " + dataset_path)
-
     try:
         dataset = read_dataset(dataset_path)
     except FileNotFoundError:
@@ -16,7 +16,12 @@ def train_and_test(dataset_path="wifi_db/clean_dataset.txt"):
 
     # confusions is an array of confusion matrices. accuracies is also an array.
     # Both have a length equal to number of folds.
-    accuracies, confusions  = test_k_folds(dataset) 
+    if prune:
+        accuracies, confusions, _ = test_k_folds_pruning(dataset)
+    else:
+        accuracies, confusions  = test_k_folds(dataset) 
+        
+    print("\nFull Accuracies:", accuracies)
 
     accuracy_avg = np.mean(accuracies)
     print("\nAccuracy average: " + str(accuracy_avg))
@@ -41,12 +46,12 @@ def train_and_test(dataset_path="wifi_db/clean_dataset.txt"):
     macro_f1 = np.zeros(len(confusions))
 
     for i, matrix in enumerate(confusions):
-        new_precisions, macro_precision[i] = eval.precision(matrix)
-        new_recalls, macro_recall[i] = eval.recall(matrix)
+        new_precisions, macro_precision[i] = precision(matrix)
+        new_recalls, macro_recall[i] = recall(matrix)
         for class_n in range(len(confusions[0])):
             precisions_matrix[class_n, i] = new_precisions[class_n] # Precision of class class_n+1 becomes a part of precisions matrix.
             recalls_matrix[class_n, i] = new_recalls[class_n]
-            f1_matrix[class_n, i] = eval.f1_score_class(new_precisions[class_n], new_recalls[class_n])
+            f1_matrix[class_n, i] = f1_score_class(new_precisions[class_n], new_recalls[class_n])
         macro_f1[i] = np.mean(f1_matrix[:, i])
 
     
@@ -76,8 +81,8 @@ def train_and_test(dataset_path="wifi_db/clean_dataset.txt"):
     # confusion_accuracy = np.trace(combined_confusion)/np.sum(combined_confusion)
     # print("\nAccuracy from confusion: " + str(confusion_accuracy)) # This is the same as average accuracy
 
-    # combined_precisions, precision_avg = eval.precision(combined_confusion)
-    # combined_recalls, recall_avg = eval.recall(combined_confusion)
+    # combined_precisions, precision_avg = precision(combined_confusion)
+    # combined_recalls, recall_avg = recall(combined_confusion)
 
     # print("Combined averaged precisions: ")
     # print(combined_precisions)
@@ -101,28 +106,40 @@ def read_dataset(filepath):
 
 
 if __name__ == "__main__":
-
     vis = TreeVis()
     while True:
-        choice = input("""Options (enter number or own filepath):
-                    1. Test algorithm on clean dataset
-                    2. Test algorithm on noisy dataset
-                    3. Visualise tree on entire clean dataset
-                    4. Exit
+        choice = int(input("""Options (enter number): 
+                    1. Test base algortihm on clean dataset
+                    2. Test base algorithm on noisy dataset
+                    3. Test pruned version on clean dataset
+                    4. Test pruned version on noisy dataset
+                    5. Visualise base tree on clean dataset
+                    6. Visualise base tree on noisy dataset
+                    7. Visualise pruned tree on clean dataset
+                    8. Visualise pruned tree on noisy dataset
+                    9. Exit
                     (otherwise test algorithm on own dataset)
-                    """)
-        if choice in ('3', 'Visualise'):
-            dataset = read_dataset('wifi_db/clean_dataset.txt')
+                    """))
+        # Exit
+        if choice == 9:
+            exit()
+            
+        # Choose dataset
+        if choice % 2 == 1:
+            dataset_path = "wifi_db/clean_dataset.txt"
+        else:
+            dataset_path = "wifi_db/noisy_dataset.txt"
+            
+        # Tests or Visualises either base or pruned tree
+        if choice <= 4:
+            train_and_test(dataset_path, prune=(choice>2))
+        elif choice <= 6:
+            dataset = read_dataset(dataset_path)
             root, depth = decision_tree_learn(dataset)
             vis.draw(root)
-        elif choice == '4':
-            exit()
-        else:
-            if choice in ('1', 'Clean'):
-                dataset_path = "wifi_db/clean_dataset.txt"
-            elif choice in ('2', 'Noisy'):
-                dataset_path = "wifi_db/noisy_dataset.txt"
-            else:
-                dataset_path = choice
-            train_and_test(dataset_path)
+        elif choice <= 8:
+            dataset = read_dataset(dataset_path)
+            root = test_k_folds_pruning(dataset)[2]
+            vis.draw(root)
+            
         print('\n' * 2)
